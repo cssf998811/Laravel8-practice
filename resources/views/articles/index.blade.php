@@ -28,3 +28,11 @@
     @endforeach
     {{ $articles->links() }}
 @endsection
+
+@section('bottom_js')
+    <script>
+        $().ready(function(){
+            console.log('hi, this is JQuery, AWESOME!');
+        })
+    </script>
+@endsection
