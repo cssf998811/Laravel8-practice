@@ -8,14 +8,23 @@ use Illuminate\Http\Request;
 class ArticlesController extends Controller
 {
     public function __construct() {
-        $this->middleware('auth')->except('index');
+        $this->middleware('auth')->except('index', 'show');
     }
 
     public function index() {
         // $articles = Article::all();
         // $articles = Article::orderBy('id', 'desc')->get();
-        $articles = Article::paginate(5);
+        // $articles = Article::paginate(5);
+        // $articles = Article::orderBy('id', 'desc')->paginate(3);
+        // prevent eager loading("N + 1" query problem)
+        $articles = Article::with('user')->orderBy('id', 'desc')->paginate(3);
         return view('articles.index', ['articles' => $articles]);
+    }
+
+    public function show($id) {
+        $article = Article::find($id);
+
+        return view('articles.show', ['article' => $article]);
     }
 
     public function create() {
@@ -52,6 +61,11 @@ class ArticlesController extends Controller
 
         $article->update($content);
         return redirect()->route('root')->with('notice', '文章更新成功');
+    }
 
+    public function destroy($id) {
+        $article = auth()->user()->articles->find($id);
+        $article->delete();
+        return redirect()->route('root')->with('notice', '文章已刪除');
     }
 }
